@@ -26,7 +26,7 @@ Sugestões são bem-vindas! Abra uma issue descrevendo:
 
 ```bash
 # Clone o repositório
-git clone https://github.com/thyagodantas/@thyagodantas/whatsapp-cloud-api.git
+git clone https://github.com/thyagodantas/whatsapp-cloud-api.git
 cd @thyagodantas/whatsapp-cloud-api
 
 # Instale as dependências
