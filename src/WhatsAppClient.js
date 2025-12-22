@@ -137,7 +137,15 @@ class WhatsAppClient {
       '.ppt': 'application/vnd.ms-powerpoint',
       '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       '.txt': 'text/plain',
-      '.csv': 'text/csv'
+      '.csv': 'text/csv',
+      
+      // Áudio
+      '.aac': 'audio/aac',
+      '.amr': 'audio/amr',
+      '.mp3': 'audio/mpeg',
+      '.m4a': 'audio/mp4',
+      '.ogg': 'audio/ogg',
+      '.opus': 'audio/opus'
     };
 
     return mimeTypes[ext] || 'application/octet-stream';
@@ -340,6 +348,52 @@ class WhatsAppClient {
       to: phoneNumber,
       type: 'document',
       document: documentData
+    };
+
+    return await this._makeRequest('/messages', data);
+  }
+
+  /**
+   * Envia um áudio
+   * @param {Object} options - Opções da mensagem
+   * @param {string} options.to - Número do destinatário
+   * @param {string} [options.audioUrl] - URL do áudio
+   * @param {string} [options.audioPath] - Caminho local do áudio
+   * @returns {Promise<Object>} Resposta da API
+   */
+  async sendAudio(options) {
+    const { to, audioUrl, audioPath } = options;
+
+    if (!to) {
+      throw new Error('O parâmetro "to" é obrigatório');
+    }
+
+    if (!audioUrl && !audioPath) {
+      throw new Error('É necessário fornecer "audioUrl" ou "audioPath"');
+    }
+
+    const phoneNumber = this._validatePhoneNumber(to);
+
+    let audioData = {};
+
+    if (audioPath) {
+      // Valida o tamanho do arquivo
+      this._validateFileSize(audioPath);
+      
+      // Faz upload do áudio
+      const mimeType = this._getMimeType(audioPath);
+      const mediaId = await this._uploadMedia(audioPath, mimeType);
+      audioData = { id: mediaId };
+    } else {
+      audioData = { link: audioUrl };
+    }
+
+    const data = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: phoneNumber,
+      type: 'audio',
+      audio: audioData
     };
 
     return await this._makeRequest('/messages', data);

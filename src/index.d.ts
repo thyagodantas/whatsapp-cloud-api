@@ -33,6 +33,12 @@ export interface SendDocumentOptions {
   filename?: string;
 }
 
+export interface SendAudioOptions {
+  to: string;
+  audioUrl?: string;
+  audioPath?: string;
+}
+
 export interface ButtonOption {
   id: string;
   title: string;
@@ -64,6 +70,7 @@ export class WhatsAppClient {
   sendImage(options: SendImageOptions): Promise<WhatsAppApiResponse>;
   sendVideo(options: SendVideoOptions): Promise<WhatsAppApiResponse>;
   sendDocument(options: SendDocumentOptions): Promise<WhatsAppApiResponse>;
+  sendAudio(options: SendAudioOptions): Promise<WhatsAppApiResponse>;
   sendButtons(options: SendButtonsOptions): Promise<WhatsAppApiResponse>;
   markAsRead(messageId: string): Promise<WhatsAppApiResponse>;
 }

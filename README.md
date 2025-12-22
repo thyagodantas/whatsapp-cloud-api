@@ -8,6 +8,7 @@ Biblioteca Node.js para facilitar o uso da WhatsApp Cloud API da Meta.
 - ✅ Envio de imagens (com ou sem legenda)
 - ✅ Envio de vídeos (com ou sem legenda)
 - ✅ Envio de documentos (com ou sem legenda)
+- ✅ Envio de áudios
 - ✅ Envio de botões interativos (Reply Buttons)
 - ✅ Suporte a arquivos até 16MB
 - ✅ Webhook para receber mensagens
@@ -95,6 +96,22 @@ await client.sendDocument({
   documentPath: './caminho/para/documento.pdf',
   caption: 'Documento importante',
   filename: 'documento.pdf'
+});
+```
+
+### Enviar Áudio
+
+```javascript
+// Com URL
+await client.sendAudio({
+  to: '5511999999999',
+  audioUrl: 'https://exemplo.com/audio.mp3'
+});
+
+// Com arquivo local
+await client.sendAudio({
+  to: '5511999999999',
+  audioPath: './caminho/para/audio.mp3'
 });
 ```
 
@@ -224,6 +241,19 @@ Envia um documento.
 - `options.documentPath` (string, opcional): Caminho local do documento
 - `options.caption` (string, opcional): Legenda do documento
 - `options.filename` (string, opcional): Nome do arquivo
+
+**Retorna:** Promise<Object>
+
+##### sendAudio(options)
+
+Envia um áudio.
+
+**Parâmetros:**
+- `options.to` (string): Número do destinatário
+- `options.audioUrl` (string, opcional): URL do áudio
+- `options.audioPath` (string, opcional): Caminho local do áudio
+
+**Formatos suportados:** AAC, AMR, MP3, M4A, OGG, OPUS
 
 **Retorna:** Promise<Object>
 
