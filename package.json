@@ -1,6 +1,6 @@
 {
   "name": "@thyagodantas/whatsapp-cloud-api",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Biblioteca Node.js para facilitar o uso da WhatsApp Cloud API",
   "main": "src/index.js",
   "types": "src/index.d.ts",
