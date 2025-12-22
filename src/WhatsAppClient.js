@@ -534,6 +534,90 @@ class WhatsAppClient {
 
     return await this._makeRequest('/messages', data);
   }
+
+  /**
+   * Lista todos os templates (modelos) de mensagens disponíveis
+   * @param {Object} [options] - Opções de filtro
+   * @param {string} [options.status] - Filtrar por status (APPROVED, PENDING, REJECTED)
+   * @param {number} [options.limit=100] - Limite de resultados por página
+   * @returns {Promise<Object>} Lista de templates
+   */
+  async listTemplates(options = {}) {
+    const { status, limit = 100 } = options;
+
+    try {
+      // Para listar templates, precisamos usar o WABA ID ao invés do phone number ID
+      // A URL base é diferente para templates
+      const wabaId = this.phoneNumberId.split('_')[0]; // Extrai o WABA ID se necessário
+      
+      let url = `https://graph.facebook.com/${this.apiVersion}/${this.phoneNumberId}/message_templates`;
+      const params = new URLSearchParams();
+      
+      if (status) {
+        params.append('status', status);
+      }
+      params.append('limit', limit.toString());
+
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`
+        }
+      });
+
+      return response.data;
+    } catch (error) {
+      throw this._handleError(error);
+    }
+  }
+
+  /**
+   * Envia uma mensagem usando um template (modelo)
+   * @param {Object} options - Opções da mensagem
+   * @param {string} options.to - Número do destinatário
+   * @param {string} options.templateName - Nome do template
+   * @param {string} options.languageCode - Código do idioma (ex: 'pt_BR', 'en_US')
+   * @param {Array} [options.components] - Componentes do template (header, body, buttons)
+   * @returns {Promise<Object>} Resposta da API
+   */
+  async sendTemplate(options) {
+    const { to, templateName, languageCode, components = [] } = options;
+
+    if (!to) {
+      throw new Error('O parâmetro "to" é obrigatório');
+    }
+    if (!templateName) {
+      throw new Error('O parâmetro "templateName" é obrigatório');
+    }
+    if (!languageCode) {
+      throw new Error('O parâmetro "languageCode" é obrigatório');
+    }
+
+    const phoneNumber = this._validatePhoneNumber(to);
+
+    const data = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: phoneNumber,
+      type: 'template',
+      template: {
+        name: templateName,
+        language: {
+          code: languageCode
+        }
+      }
+    };
+
+    // Adiciona componentes se fornecidos
+    if (components.length > 0) {
+      data.template.components = components;
+    }
+
+    return await this._makeRequest('/messages', data);
+  }
 }
 
 module.exports = WhatsAppClient;

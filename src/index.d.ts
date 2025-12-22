@@ -39,6 +39,56 @@ export interface SendAudioOptions {
   audioPath?: string;
 }
 
+export interface ListTemplatesOptions {
+  status?: 'APPROVED' | 'PENDING' | 'REJECTED';
+  limit?: number;
+}
+
+export interface TemplateComponent {
+  type: 'header' | 'body' | 'button';
+  sub_type?: string;
+  parameters?: Array<{
+    type: string;
+    text?: string;
+    payload?: string;
+    image?: { link: string };
+    video?: { link: string };
+    document?: { link: string; filename?: string };
+  }>;
+  index?: number;
+}
+
+export interface SendTemplateOptions {
+  to: string;
+  templateName: string;
+  languageCode: string;
+  components?: TemplateComponent[];
+}
+
+export interface Template {
+  name: string;
+  components: Array<{
+    type: string;
+    format?: string;
+    text?: string;
+    buttons?: any[];
+  }>;
+  language: string;
+  status: string;
+  category: string;
+  id: string;
+}
+
+export interface ListTemplatesResponse {
+  data: Template[];
+  paging?: {
+    cursors?: {
+      before?: string;
+      after?: string;
+    };
+  };
+}
+
 export interface ButtonOption {
   id: string;
   title: string;
@@ -72,6 +122,8 @@ export class WhatsAppClient {
   sendDocument(options: SendDocumentOptions): Promise<WhatsAppApiResponse>;
   sendAudio(options: SendAudioOptions): Promise<WhatsAppApiResponse>;
   sendButtons(options: SendButtonsOptions): Promise<WhatsAppApiResponse>;
+  sendTemplate(options: SendTemplateOptions): Promise<WhatsAppApiResponse>;
+  listTemplates(options?: ListTemplatesOptions): Promise<ListTemplatesResponse>;
   markAsRead(messageId: string): Promise<WhatsAppApiResponse>;
 }
 

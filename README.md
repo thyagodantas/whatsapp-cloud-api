@@ -10,6 +10,8 @@ Biblioteca Node.js para facilitar o uso da WhatsApp Cloud API da Meta.
 - ✅ Envio de documentos (com ou sem legenda)
 - ✅ Envio de áudios
 - ✅ Envio de botões interativos (Reply Buttons)
+- ✅ Envio de mensagens com templates (modelos)
+- ✅ Listagem de templates disponíveis
 - ✅ Suporte a arquivos até 16MB
 - ✅ Webhook para receber mensagens
 - ✅ TypeScript definitions incluídas
@@ -142,6 +144,96 @@ await client.sendButtons({
 });
 ```
 
+### Listar Templates Disponíveis
+
+```javascript
+// Listar todos os templates aprovados
+const templates = await client.listTemplates({
+  status: 'APPROVED',
+  limit: 50
+});
+
+console.log('Templates disponíveis:', templates.data);
+
+// Listar todos os templates (sem filtro)
+const allTemplates = await client.listTemplates();
+```
+
+### Enviar Mensagem com Template
+
+```javascript
+// Template simples (sem variáveis)
+await client.sendTemplate({
+  to: '5511999999999',
+  templateName: 'hello_world',
+  languageCode: 'pt_BR'
+});
+
+// Template com variáveis no body
+await client.sendTemplate({
+  to: '5511999999999',
+  templateName: 'welcome_message',
+  languageCode: 'pt_BR',
+  components: [
+    {
+      type: 'body',
+      parameters: [
+        { type: 'text', text: 'João Silva' },
+        { type: 'text', text: '15/12/2024' }
+      ]
+    }
+  ]
+});
+
+// Template com header de imagem e variáveis
+await client.sendTemplate({
+  to: '5511999999999',
+  templateName: 'promotional_offer',
+  languageCode: 'pt_BR',
+  components: [
+    {
+      type: 'header',
+      parameters: [
+        {
+          type: 'image',
+          image: { link: 'https://exemplo.com/promo.jpg' }
+        }
+      ]
+    },
+    {
+      type: 'body',
+      parameters: [
+        { type: 'text', text: 'Black Friday' },
+        { type: 'text', text: '50%' }
+      ]
+    }
+  ]
+});
+
+// Template com botões
+await client.sendTemplate({
+  to: '5511999999999',
+  templateName: 'order_confirmation',
+  languageCode: 'pt_BR',
+  components: [
+    {
+      type: 'body',
+      parameters: [
+        { type: 'text', text: '#12345' }
+      ]
+    },
+    {
+      type: 'button',
+      sub_type: 'url',
+      index: 0,
+      parameters: [
+        { type: 'text', text: '12345' }
+      ]
+    }
+  ]
+});
+```
+
 ## 🔔 Webhook para Receber Mensagens
 
 ### Configuração com Express
@@ -269,6 +361,54 @@ Envia botões interativos (Reply Buttons).
   - `buttons[].title` (string): Título do botão (máx 20 caracteres)
 - `options.header` (string, opcional): Texto do cabeçalho (máx 60 caracteres)
 - `options.footer` (string, opcional): Texto do rodapé (máx 60 caracteres)
+
+**Retorna:** Promise<Object>
+
+##### listTemplates(options)
+
+Lista todos os templates (modelos) de mensagens disponíveis.
+
+**Parâmetros:**
+- `options.status` (string, opcional): Filtrar por status ('APPROVED', 'PENDING', 'REJECTED')
+- `options.limit` (number, opcional): Limite de resultados por página (padrão: 100)
+
+**Retorna:** Promise<Object>
+```javascript
+{
+  data: [
+    {
+      name: 'hello_world',
+      components: [...],
+      language: 'pt_BR',
+      status: 'APPROVED',
+      category: 'UTILITY',
+      id: '123456789'
+    }
+  ],
+  paging: { ... }
+}
+```
+
+##### sendTemplate(options)
+
+Envia uma mensagem usando um template (modelo).
+
+**Parâmetros:**
+- `options.to` (string): Número do destinatário
+- `options.templateName` (string): Nome do template
+- `options.languageCode` (string): Código do idioma (ex: 'pt_BR', 'en_US', 'es')
+- `options.components` (Array, opcional): Componentes do template
+  - `components[].type` (string): Tipo do componente ('header', 'body', 'button')
+  - `components[].parameters` (Array): Parâmetros do componente
+    - `type` (string): Tipo do parâmetro ('text', 'image', 'video', 'document')
+    - `text` (string): Texto do parâmetro (para type='text')
+    - `image/video/document` (Object): Objeto com link (para tipos de mídia)
+
+**Códigos de idioma comuns:**
+- `pt_BR` - Português (Brasil)
+- `en_US` - Inglês (Estados Unidos)
+- `es` - Espanhol
+- `en` - Inglês
 
 **Retorna:** Promise<Object>
 
